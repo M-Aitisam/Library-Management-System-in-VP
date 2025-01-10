@@ -1,6 +1,6 @@
 ﻿@page "/books"
 @inject NavigationManager NavigationManager
-@using _230456_AitisamAhmed_vplabPaper.Services 
+@using _230456_AitisamAhmed_vplabPaper.Services
 @using _230456_AitisamAhmed_vplabPaper.Data
 
 @inject IBookService BookService
@@ -41,8 +41,12 @@ else
 @code {
     private IEnumerable<Book> books;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        books = await BookService.GetBooksAsync();
+        if (firstRender)
+        {
+            books = await BookService.GetBooksAsync();
+            StateHasChanged(); // Re-render after data is loaded
+        }
     }
 }
