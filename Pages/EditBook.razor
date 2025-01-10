@@ -1,0 +1,130 @@
+﻿@page "/editbook"
+@attribute [Authorize]
+@using Blazored.LocalStorage
+@inject ILocalStorageService localStorage
+@inject IBookService bookService
+@inject NavigationManager NavigationManager
+
+
+<h3>Edit Book</h3>
+
+@if (books == null || !books.Any())
+{
+    <p>No books available to edit.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genre</th>
+                <th>Publication Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.Genre</td>
+                    <td>@book.PublicationDate.ToShortDateString()</td>
+                    <td>@book.Status</td>
+                    <td>
+                        <button class="btn btn-warning" @onclick="() => EditBookDetails(book)">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedBook != null)
+{
+    <h4>Edit Selected Book</h4>
+    <EditForm Model="selectedBook" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="Title" class="form-label">Title</label>
+            <InputText id="Title" class="form-control" @bind-Value="selectedBook.Title" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Author" class="form-label">Author</label>
+            <InputText id="Author" class="form-control" @bind-Value="selectedBook.Author" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Genre" class="form-label">Genre</label>
+            <InputText id="Genre" class="form-control" @bind-Value="selectedBook.Genre" />
+        </div>
+
+        <div class="mb-3">
+            <label for="PublicationDate" class="form-label">Publication Date</label>
+            <InputDate id="PublicationDate" class="form-control" @bind-Value="selectedBook.PublicationDate" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Status" class="form-label">Status</label>
+            <InputText id="Status" class="form-control" @bind-Value="selectedBook.Status" />
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+            <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private List<Book> books;
+    private Book selectedBook;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Retrieve books from local storage using the service
+        books = (await bookService.GetBooksAsync()).ToList();
+    }
+
+    private void EditBookDetails(Book book)
+    {
+        // Set the selected book for editing
+        selectedBook = book;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await bookService.UpdateBookAsync(selectedBook);
+        NavigationManager.NavigateTo("/books");
+    }
+
+    private void CancelEdit()
+    {
+        // Reset the selected book and navigate back
+        selectedBook = null;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        var confirmed = await ShowConfirmationDialog();
+        if (confirmed)
+        {
+            await bookService.DeleteBookAsync(selectedBook.Id);
+            selectedBook = null;
+            NavigationManager.NavigateTo("/books");
+        }
+    }
+
+    private async Task<bool> ShowConfirmationDialog()
+    {
+        // Simulated confirmation dialog
+        return await Task.FromResult(true);
+    }
+}

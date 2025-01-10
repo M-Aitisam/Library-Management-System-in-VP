@@ -1,0 +1,48 @@
+﻿@page "/books"
+@inject NavigationManager NavigationManager
+@using _230456_AitisamAhmed_vplabPaper.Services 
+@using _230456_AitisamAhmed_vplabPaper.Data
+
+@inject IBookService BookService
+
+<h3>Books</h3>
+
+@if (books == null)
+{
+    <p>Loading books...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genre</th>
+                <th>Publication Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.Genre</td>
+                    <td>@book.PublicationDate.ToShortDateString()</td>
+                    <td>@book.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Book> books;
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await BookService.GetBooksAsync();
+    }
+}

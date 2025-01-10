@@ -1,0 +1,38 @@
+﻿@page "/bookdetails/{BookId:int}"
+@inject IBookService BookService
+@inject NavigationManager NavigationManager
+
+
+
+<h3>Book Details</h3>
+
+@if (book == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div>
+        <p><strong>Title:</strong> @book.Title</p>
+        <p><strong>Author:</strong> @book.Author</p>
+        <p><strong>Genre:</strong> @book.Genre</p>
+        <p><strong>Publication Date:</strong> @book.PublicationDate.ToShortDateString()</p>
+        <p><strong>Status:</strong> @book.Status</p>
+    </div>
+    <button class="btn btn-secondary" @onclick="NavigateBack">Back</button>
+}
+
+@code {
+    [Parameter] public int BookId { get; set; }
+    private Book book;
+
+    protected override async Task OnInitializedAsync()
+    {
+        book = await BookService.GetBookByIdAsync(BookId);
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/books");
+    }
+}

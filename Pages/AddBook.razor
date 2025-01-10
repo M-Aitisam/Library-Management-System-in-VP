@@ -1,0 +1,69 @@
+﻿@page "/addbook"
+
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+@inject IBookService BookService
+@inject NavigationManager NavigationManager
+
+<h3>Add Book</h3>
+
+<EditForm Model="book" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="Title" class="form-label">Title</label>
+        <InputText id="Title" class="form-control" @bind-Value="book.Title" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Author" class="form-label">Author</label>
+        <InputText id="Author" class="form-control" @bind-Value="book.Author" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Genre" class="form-label">Genre</label>
+        <InputText id="Genre" class="form-control" @bind-Value="book.Genre" />
+    </div>
+
+    <div class="mb-3">
+        <label for="PublicationDate" class="form-label">Publication Date</label>
+        <InputDate id="PublicationDate" class="form-control" @bind-Value="book.PublicationDate" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Status" class="form-label">Status</label>
+        <InputText id="Status" class="form-control" @bind-Value="book.Status" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-secondary" @onclick="NavigateBack">Cancel</button>
+</EditForm>
+
+@code {
+    private Book book = new Book();
+
+
+
+    private async Task HandleValidSubmit()
+
+    {
+
+        await BookService.AddBookAsync(book);
+
+        NavigationManager.NavigateTo("/books");
+
+    }
+
+
+
+    private void NavigateBack()
+
+    {
+
+        NavigationManager.NavigateTo("/books");
+
+    }
+}
+
